@@ -103,4 +103,16 @@ public class AerospikeStore{
     public AsyncClient getClient() {
         return client;
     }
+
+    static Set<String> iocBinKeys = new LinkedHashSet<>();
+
+    static {
+        iocBinKeys.add("ioc");
+        iocBinKeys.add("num_ioc");
+    }
+
+    public void updateIOC(String endpointUUID, Set<String> iocs){
+        put("malware", "ioc", endpointUUID,
+                iocBinKeys, Arrays.asList(iocs, iocs.size()));
+    }
 }
