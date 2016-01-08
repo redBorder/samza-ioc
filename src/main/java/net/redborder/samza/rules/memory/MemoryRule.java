@@ -7,29 +7,38 @@ import net.redborder.samza.rules.Rule;
 import java.util.Map;
 
 public class MemoryRule extends Rule {
-    BaseRule rule;
-    String memoryField;
+    public BaseRule rule;
+    public String memoryField;
     Object memory;
 
     public MemoryRule(String ruleUuid, BaseRule rule, String memoryField) {
         super(ruleUuid);
         this.rule = rule;
         this.memoryField = memoryField;
+        type = "memory";
     }
 
     @Override
     public Boolean disable(String endpoint, Map<String, Object> condition) {
-        return rule.verify(endpoint, condition);
+        Boolean enabled = rule.verify(endpoint, condition);
+
+        if(enabled != null && !enabled){
+            memory = condition.get(memoryField);
+        }
+
+        if(enabled == null) enabled = false;
+        return !enabled;
     }
 
     @Override
     public Boolean enable(String endpoint, Map<String, Object> condition) {
         Boolean enabled = rule.verify(endpoint, condition);
 
-        if(enabled){
+        if(enabled != null && enabled){
             memory = condition.get(memoryField);
         }
 
+        if(enabled == null) enabled = false;
         return enabled;
     }
 

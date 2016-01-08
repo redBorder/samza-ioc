@@ -4,6 +4,7 @@ import net.redborder.samza.rules.base.ContainsRule;
 import net.redborder.samza.rules.base.FieldRule;
 import net.redborder.samza.rules.logic.ANDRule;
 import net.redborder.samza.rules.logic.ORRule;
+import net.redborder.samza.rules.memory.InvalidMemoryRuleException;
 import net.redborder.samza.rules.memory.MemoryRule;
 import net.redborder.samza.rules.memory.MemoryRuleManager;
 import net.redborder.samza.rules.memory.QueryMemoryRule;
@@ -19,16 +20,15 @@ import java.io.IOException;
 import java.util.*;
 
 public class RulesManager {
-    MemoryRuleManager memoryRuleManager;
-    List<Rule> rules = new LinkedList<>();
-    KeyValueStore<String, Set<String>> rulesStores;
+    public MemoryRuleManager memoryRuleManager;
+    public List<Rule> rules = new LinkedList<>();
+    public KeyValueStore<String, Set<String>> rulesStores;
 
     private static final Logger log = LoggerFactory.getLogger(RulesManager.class);
 
-
     public RulesManager(Config config, TaskContext taskContext) {
-        String jsonRules = config.get("net.redborder.ioc.rules", "{}");
-        String jsonMemoryRules = config.get("net.redborder.ioc.rules.memory", "{}");
+        String jsonRules = config.get("net.redborder.ioc.rules", "[]");
+        String jsonMemoryRules = config.get("net.redborder.ioc.rules.memory", "[]");
 
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,12 +51,16 @@ public class RulesManager {
         List<MemoryRule> memoryRules = new LinkedList<>();
 
         for (Map<String, Object> rule : rules) {
-            String uuid = (String) rule.get("uuid");
+            String uuid = String.valueOf(rule.get("uuid"));
             String memoryField = (String) rule.get("memoryField");
             Map<String, Object> baseRuleMap = (Map<String, Object>) rule.get("baseRule");
 
-            BaseRule baseRule = RuleBuilder.buildBaseRule(memoryRuleManager, baseRuleMap);
-            memoryRules.add(new MemoryRule(uuid, baseRule, memoryField));
+            try {
+                BaseRule baseRule = RuleBuilder.buildBaseRule(memoryRuleManager, baseRuleMap);
+                memoryRules.add(new MemoryRule(uuid, baseRule, memoryField));
+            } catch (Exception ex) {
+                log.error("Unable to make rule [ " + rule + " ]", ex);
+            }
         }
 
         this.memoryRuleManager =
@@ -67,8 +71,14 @@ public class RulesManager {
         this.rulesStores = (KeyValueStore<String, Set<String>>) taskContext.getStore("rules");
 
         for (Map<String, Object> mapRule : mapRules) {
-            Rule rule = RuleBuilder.buildRule(memoryRuleManager, mapRule);
-            rules.add(rule);
+            try {
+                Rule rule = RuleBuilder.buildRule(memoryRuleManager, mapRule);
+                rules.add(rule);
+            }catch (InvalidMemoryRuleException ex) {
+                log.error("Invalid memory rule uuid.", ex);
+            }catch (Exception ex) {
+                log.error("Unable to make rule [ " + mapRule + " ]", ex);
+            }
         }
     }
 
@@ -82,7 +92,7 @@ public class RulesManager {
 
         for (Rule rule : rules) {
             Boolean verification = rule.verify(endpoint, condition);
-            if(verification != null) {
+            if (verification != null) {
                 if (verification) {
                     endpointRules.add(rule.ruleUuid);
                 } else {
@@ -101,9 +111,9 @@ public class RulesManager {
 
     public static class RuleBuilder {
 
-        public static BaseRule buildBaseRule(MemoryRuleManager memoryRuleManager, Map<String, Object> ruleMap) {
+        public static BaseRule buildBaseRule(MemoryRuleManager memoryRuleManager, Map<String, Object> ruleMap) throws Exception {
             String type = (String) ruleMap.get("type");
-            String uuid = (String) ruleMap.get("uuid");
+            String uuid = String.valueOf(ruleMap.get("uuid"));
             BaseRule baseRule = null;
 
             if (type.equals("field")) {
@@ -143,9 +153,9 @@ public class RulesManager {
             return baseRule;
         }
 
-        public static Rule buildRule(MemoryRuleManager memoryRuleManager, Map<String, Object> ruleMap) {
+        public static Rule buildRule(MemoryRuleManager memoryRuleManager, Map<String, Object> ruleMap) throws Exception {
             String type = (String) ruleMap.get("type");
-            String uuid = (String) ruleMap.get("uuid");
+            String uuid = String.valueOf(ruleMap.get("uuid"));
             Rule rule;
 
             if (type.equals("queryMemory")) {

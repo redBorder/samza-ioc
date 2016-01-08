@@ -5,8 +5,8 @@ import org.apache.samza.storage.kv.KeyValueStore;
 import java.util.*;
 
 public class MemoryRuleManager {
-    List<MemoryRule> memoryRules = new LinkedList<>();
-    List<String> memoryRulesIds = new LinkedList<>();
+    public List<MemoryRule> memoryRules = new LinkedList<>();
+    public List<String> memoryRulesIds = new LinkedList<>();
 
     KeyValueStore<String, Set<String>> store;
 
@@ -28,31 +28,38 @@ public class MemoryRuleManager {
         }
 
         for (MemoryRule rule : memoryRules) {
-            if (rule.verify(endpoint, condition)) {
-                enabledRules.add(rule.ruleUuid + ":" + rule.getLastMemory());
-                store.put(endpoint, enabledRules);
-            } else {
-                enabledRules.remove(rule.ruleUuid + ":" + rule.getLastMemory());
-                store.put(endpoint, enabledRules);
+            Boolean verification = rule.verify(endpoint, condition);
+            if(verification != null) {
+                if (verification) {
+                    enabledRules.add(rule.ruleUuid + ":" + rule.getLastMemory());
+                    store.put(endpoint, enabledRules);
+                } else {
+                    enabledRules.remove(rule.ruleUuid + ":" + rule.getLastMemory());
+                    store.put(endpoint, enabledRules);
+                }
             }
         }
     }
 
-    public void isValidRule(String uuid) throws InvalidMemoryRuleException{
+    public Boolean isValidRule(String uuid) throws InvalidMemoryRuleException {
         if(!memoryRulesIds.contains(uuid)){
             throw new InvalidMemoryRuleException("The memory rule [" + uuid + "], doesn't exist. " +
                     "Valid memory rules " + memoryRulesIds);
         }
+
+        return true;
     }
 
     public Boolean queryRule(String endpoint, String uuid) {
         Boolean enabled = false;
 
         Set<String> rules = store.get(endpoint);
-        for (String rule : rules) {
-            if (rule.split(":")[0].equals(uuid)) {
-                enabled = true;
-                break;
+        if(rules != null) {
+            for (String rule : rules) {
+                if (rule.split(":")[0].equals(uuid)) {
+                    enabled = true;
+                    break;
+                }
             }
         }
 

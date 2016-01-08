@@ -39,6 +39,11 @@ public class MockKeyValueStore implements KeyValueStore<String, Set<String>> {
     }
 
     @Override
+    public String toString() {
+        return store.toString();
+    }
+
+    @Override
     public void deleteAll(List<String> list) {
 
     }

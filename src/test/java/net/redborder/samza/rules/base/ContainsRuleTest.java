@@ -13,7 +13,7 @@ import java.util.Map;
 public class ContainsRuleTest extends TestCase{
 
     @Test
-    public void enableRule() {
+    public void enableRule() throws FewConditionsException {
         Map<String, String> enabledConditions = new HashMap<>();
         Map<String, String> disabledConditions = new HashMap<>();
 
@@ -38,7 +38,7 @@ public class ContainsRuleTest extends TestCase{
     }
 
     @Test
-    public void disableRule() {
+    public void disableRule() throws FewConditionsException {
         Map<String, String> enabledConditions = new HashMap<>();
         Map<String, String> disabledConditions = new HashMap<>();
 
@@ -63,7 +63,7 @@ public class ContainsRuleTest extends TestCase{
     }
 
     @Test
-    public void notEnableAndDisableRule() {
+    public void notEnableAndDisableRule() throws FewConditionsException {
         Map<String, String> enabledConditions = new HashMap<>();
         Map<String, String> disabledConditions = new HashMap<>();
 
@@ -88,7 +88,7 @@ public class ContainsRuleTest extends TestCase{
     }
 
     @Test
-    public void enableAndDisablerule() {
+    public void enableAndDisablerule() throws FewConditionsException {
         Map<String, String> enabledConditions = new HashMap<>();
         Map<String, String> disabledConditions = new HashMap<>();
 
@@ -119,5 +119,13 @@ public class ContainsRuleTest extends TestCase{
         messageDisable.put("otherField2", "otherValue2");
 
         assertFalse(rule.verify("AABBCCDD", messageDisable));
+    }
+
+    @Test(expected = FewConditionsException.class)
+    public void fewConditionExceptionTest() throws FewConditionsException {
+        Map<String, String> enabledConditions = new HashMap<>();
+        Map<String, String> disabledConditions = new HashMap<>();
+
+        ContainsRule rule = new ContainsRule("1234", enabledConditions, disabledConditions);
     }
 }

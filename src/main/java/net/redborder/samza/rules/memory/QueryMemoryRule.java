@@ -11,9 +11,13 @@ public class QueryMemoryRule extends Rule {
     MemoryRuleManager memoryRuleManager;
     private static final Logger log = LoggerFactory.getLogger(QueryMemoryRule.class);
 
-    public QueryMemoryRule(String ruleUuid, MemoryRuleManager memoryRuleManager) {
+
+    public QueryMemoryRule(String ruleUuid, MemoryRuleManager memoryRuleManager) throws InvalidMemoryRuleException {
         super(ruleUuid);
         this.memoryRuleManager = memoryRuleManager;
+        type = "queryMemory";
+        memoryRuleManager.isValidRule(ruleUuid);
+
     }
 
     @Override

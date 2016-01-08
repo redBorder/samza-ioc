@@ -12,7 +12,9 @@ public class ORRule extends BaseRule {
     public ORRule(String ruleUuid, List<Rule> rules) {
         super(ruleUuid);
         this.rules = rules;
+        type = "or";
     }
+
     @Override
     public Boolean disable(String endpoint, Map<String, Object> condition) {
         Boolean isEnabled = true;

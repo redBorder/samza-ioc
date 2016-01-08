@@ -3,6 +3,7 @@ package net.redborder.samza.rules.logic;
 import junit.framework.TestCase;
 import net.redborder.samza.rules.Rule;
 import net.redborder.samza.rules.base.ContainsRule;
+import net.redborder.samza.rules.base.FewConditionsException;
 import net.redborder.samza.rules.base.FieldRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +16,7 @@ import java.util.*;
 public class ORRuleTest extends TestCase {
 
     @Test
-    public void allEnableRule() {
+    public void allEnableRule() throws FewConditionsException {
         Map<String, String> enabledConditionsContains = new HashMap<>();
         Map<String, String> disabledConditionsContains = new HashMap<>();
         enabledConditionsContains.put("field1", "value1");
@@ -47,7 +48,7 @@ public class ORRuleTest extends TestCase {
     }
 
     @Test
-    public void onceEnabledRule() {
+    public void onceEnabledRule() throws FewConditionsException {
         Map<String, String> enabledConditionsContains = new HashMap<>();
         Map<String, String> disabledConditionsContains = new HashMap<>();
         enabledConditionsContains.put("field1", "value1");
@@ -79,7 +80,7 @@ public class ORRuleTest extends TestCase {
     }
 
     @Test
-    public void allDisableRule() {
+    public void allDisableRule() throws FewConditionsException {
         Map<String, String> enabledConditionsContains = new HashMap<>();
         Map<String, String> disabledConditionsContains = new HashMap<>();
         enabledConditionsContains.put("field1", "value1");
@@ -109,7 +110,7 @@ public class ORRuleTest extends TestCase {
     }
 
     @Test
-    public void notEnableAndDisableRule() {
+    public void notEnableAndDisableRule() throws FewConditionsException {
         Map<String, String> enabledConditionsContains = new HashMap<>();
         Map<String, String> disabledConditionsContains = new HashMap<>();
         enabledConditionsContains.put("field1", "value1");
@@ -137,7 +138,7 @@ public class ORRuleTest extends TestCase {
     }
 
     @Test
-    public void enableAndDisablerule() {
+    public void enableAndDisablerule() throws FewConditionsException {
         Map<String, String> enabledConditionsContains = new HashMap<>();
         Map<String, String> disabledConditionsContains = new HashMap<>();
         enabledConditionsContains.put("field1", "value1");

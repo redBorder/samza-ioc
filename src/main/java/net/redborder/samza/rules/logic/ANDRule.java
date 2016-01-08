@@ -12,6 +12,7 @@ public class ANDRule extends BaseRule {
     public ANDRule(String ruleUuid, List<Rule> rules) {
         super(ruleUuid);
         this.rules = rules;
+        type = "and";
     }
 
     @Override
@@ -42,5 +43,9 @@ public class ANDRule extends BaseRule {
         }
 
         return isEnabled;
+    }
+
+    public String getType(){
+        return type;
     }
 }

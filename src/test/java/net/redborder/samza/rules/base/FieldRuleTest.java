@@ -12,7 +12,7 @@ import java.util.Map;
 public class FieldRuleTest extends TestCase{
 
     @Test
-    public void enableRule() {
+    public void enableRule() throws FewConditionsException {
         Map<String, Object> enabledConditions = new HashMap<>();
         Map<String, Object> disabledConditions = new HashMap<>();
 
@@ -37,7 +37,7 @@ public class FieldRuleTest extends TestCase{
     }
 
     @Test
-    public void disableRule() {
+    public void disableRule() throws FewConditionsException {
         Map<String, Object> enabledConditions = new HashMap<>();
         Map<String, Object> disabledConditions = new HashMap<>();
 
@@ -62,7 +62,7 @@ public class FieldRuleTest extends TestCase{
     }
 
     @Test
-    public void notEnableAndDisableRule() {
+    public void notEnableAndDisableRule() throws FewConditionsException {
         Map<String, Object> enabledConditions = new HashMap<>();
         Map<String, Object> disabledConditions = new HashMap<>();
 
@@ -87,7 +87,7 @@ public class FieldRuleTest extends TestCase{
     }
 
     @Test
-    public void enableAndDisablerule() {
+    public void enableAndDisablerule() throws FewConditionsException {
         Map<String, Object> enabledConditions = new HashMap<>();
         Map<String, Object> disabledConditions = new HashMap<>();
 
@@ -118,5 +118,13 @@ public class FieldRuleTest extends TestCase{
         messageDisable.put("otherField2", "otherValue2");
 
         assertFalse(rule.verify("AABBCCDD", messageDisable));
+    }
+
+    @Test(expected = FewConditionsException.class)
+    public void fewConditionExceptionTest() throws FewConditionsException {
+        Map<String, Object> enabledConditions = new HashMap<>();
+        Map<String, Object> disabledConditions = new HashMap<>();
+
+        FieldRule rule = new FieldRule("1234", enabledConditions, disabledConditions);
     }
 }

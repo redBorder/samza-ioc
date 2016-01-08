@@ -8,10 +8,16 @@ public class ContainsRule extends BaseRule {
     Map<String, String> enableConditions;
     Map<String, String> disableConditions;
 
-    public ContainsRule(String ruleUuid, Map<String, String> enableConditions, Map<String, String> disableConditions) {
+    public ContainsRule(String ruleUuid, Map<String, String> enableConditions, Map<String, String> disableConditions) throws FewConditionsException {
         super(ruleUuid);
+
+        if(enableConditions == null || disableConditions == null || (enableConditions.size() + disableConditions.size()) < 2){
+            throw new FewConditionsException("You must provide al least one enable and disable conditions.");
+        }
+
         this.enableConditions = enableConditions;
         this.disableConditions = disableConditions;
+        type = "contains";
     }
 
     @Override

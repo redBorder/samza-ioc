@@ -12,7 +12,7 @@ import org.apache.samza.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AerospikeStore{
+public class AerospikeStore {
     private static final Logger log = LoggerFactory.getLogger(AerospikeStore.class);
 
     AsyncClient client;
