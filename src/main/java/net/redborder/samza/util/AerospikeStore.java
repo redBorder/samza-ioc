@@ -1,6 +1,7 @@
 package net.redborder.samza.util;
 
 import java.util.*;
+
 import com.aerospike.client.*;
 import com.aerospike.client.async.AsyncClient;
 import com.aerospike.client.async.AsyncClientPolicy;
@@ -40,15 +41,20 @@ public class AerospikeStore {
     }
 
     public Map<String, Object> get(String namespace, String collection, String key) {
-        Record record = client.get(new Policy(), new Key(namespace, collection, key));
-
         Map<String, Object> result = new HashMap<>();
+        try {
+            Record record = client.get(new Policy(), new Key(namespace, collection, key));
 
-        if (record != null) {
-            result.putAll(record.bins);
+
+            if (record != null) {
+                result.putAll(record.bins);
+            }
+
+        } catch (AerospikeException ex) {
+            log.error("Aerospike exception", ex);
         }
-
         return result;
+
     }
 
     public Boolean exist(String namespace, String collection, String key) {
@@ -56,48 +62,60 @@ public class AerospikeStore {
     }
 
     public void put(String namespace, String collection, String key, Set<String> columns, Collection<Object> values) {
-        List<String> columnsList = new ArrayList<>();
-        columnsList.addAll(columns);
+        try {
+            List<String> columnsList = new ArrayList<>();
+            columnsList.addAll(columns);
 
-        List<Object> valueList = new ArrayList<>();
-        valueList.addAll(values);
+            List<Object> valueList = new ArrayList<>();
+            valueList.addAll(values);
 
-        Key asKey = new Key(namespace, collection, key);
-        Bin[] bins = new Bin[columnsList.size()];
+            Key asKey = new Key(namespace, collection, key);
+            Bin[] bins = new Bin[columnsList.size()];
 
-        WritePolicy policy = new WritePolicy();
-        policy.recordExistsAction = RecordExistsAction.UPDATE;
+            WritePolicy policy = new WritePolicy();
+            policy.recordExistsAction = RecordExistsAction.UPDATE;
 
-        for (int i = 0; i < columns.size(); i++) {
-            bins[i] = new Bin(columnsList.get(i), valueList.get(i));
+            for (int i = 0; i < columns.size(); i++) {
+                bins[i] = new Bin(columnsList.get(i), valueList.get(i));
+            }
+
+            client.put(policy, asKey, bins);
+        } catch (AerospikeException ex) {
+            log.error("Aerospike exception", ex);
         }
-
-        client.put(policy, asKey, bins);
     }
 
     public void remove(String namespace, String collection, String key) {
-        Key asKey = new Key(namespace, collection, key);
-        client.delete(new WritePolicy(), asKey);
+        try {
+            Key asKey = new Key(namespace, collection, key);
+            client.delete(new WritePolicy(), asKey);
+        } catch (AerospikeException ex) {
+            log.error("Aerospike exception", ex);
+        }
     }
 
     public void increment(String namespace, String collection, String key, Set<String> columns, Collection<Integer> values) {
-        List<String> columnsList = new ArrayList<>();
-        columnsList.addAll(columns);
+        try {
+            List<String> columnsList = new ArrayList<>();
+            columnsList.addAll(columns);
 
-        List<Object> valueList = new ArrayList<>();
-        valueList.addAll(values);
+            List<Object> valueList = new ArrayList<>();
+            valueList.addAll(values);
 
-        Key asKey = new Key(namespace, collection, key);
-        Operation[] operations = new Operation[columnsList.size()];
+            Key asKey = new Key(namespace, collection, key);
+            Operation[] operations = new Operation[columnsList.size()];
 
-        WritePolicy policy = new WritePolicy();
-        policy.recordExistsAction = RecordExistsAction.UPDATE;
+            WritePolicy policy = new WritePolicy();
+            policy.recordExistsAction = RecordExistsAction.UPDATE;
 
-        for (int i = 0; i < columnsList.size(); i++) {
-            operations[i] = Operation.add(new Bin(columnsList.get(i), valueList.get(i)));
+            for (int i = 0; i < columnsList.size(); i++) {
+                operations[i] = Operation.add(new Bin(columnsList.get(i), valueList.get(i)));
+            }
+
+            client.operate(policy, asKey, operations);
+        } catch (AerospikeException ex) {
+            log.error("Aerospike exception", ex);
         }
-
-        client.operate(policy, asKey, operations);
     }
 
     public AsyncClient getClient() {
@@ -111,7 +129,7 @@ public class AerospikeStore {
         iocBinKeys.add("num_ioc");
     }
 
-    public void updateIOC(String endpointUUID, Set<String> iocs){
+    public void updateIOC(String endpointUUID, Set<String> iocs) {
         put("malware", "ioc", endpointUUID,
                 iocBinKeys, Arrays.asList(iocs, iocs.size()));
     }

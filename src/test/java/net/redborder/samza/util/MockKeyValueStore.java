@@ -55,7 +55,35 @@ public class MockKeyValueStore implements KeyValueStore<String, Set<String>> {
 
     @Override
     public KeyValueIterator<String, Set<String>> all() {
-        return null;
+        final Iterator<java.util.Map.Entry<String, Set<String>>> iterator = store.entrySet().iterator();
+
+        KeyValueIterator<String, Set<String>> keyValueIterator = new KeyValueIterator<String, Set<String>>() {
+
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public Entry<String, Set<String>> next() {
+                java.util.Map.Entry<String, Set<String>> entry = iterator.next();
+                Entry<String, Set<String>> e = new Entry<>(entry.getKey(), entry.getValue());
+
+                return e;
+            }
+
+            @Override
+            public void remove() {
+
+            }
+        };
+
+        return keyValueIterator;
     }
 
     @Override
