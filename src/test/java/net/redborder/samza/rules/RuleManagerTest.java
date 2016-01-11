@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -23,7 +24,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/fieldConfig.properties"));
+                URI.create("src/test/resources/rules/fieldConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
@@ -35,7 +36,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/containsConfig.properties"));
+                URI.create("src/test/resources/rules/containsConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
@@ -47,7 +48,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/andConfig.properties"));
+                URI.create("src/test/resources/rules/andConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
@@ -59,7 +60,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/orConfig.properties"));
+                URI.create("src/test/resources/rules/orConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
@@ -71,7 +72,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/memoryConfig.properties"));
+                URI.create("src/test/resources/rules/memoryConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
@@ -85,7 +86,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/queryMemoryConfig.properties"));
+                URI.create("src/test/resources/rules/queryMemoryConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
@@ -102,7 +103,7 @@ public class RuleManagerTest extends TestCase{
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
         Config config = propertiesConfigFactory.getConfig(
-                URI.create("/Volumes/sd-card/redBorder/projects/samza-ioc/src/test/resources/rules/invalidQueryMemoryConfig.properties"));
+                URI.create("src/test/resources/rules/invalidQueryMemoryConfig.properties"));
 
         RulesManager rulesManager = new RulesManager(config, mockTaskContext);
 
