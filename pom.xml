@@ -12,6 +12,25 @@
         <samza.version>0.10.0</samza.version>
     </properties>
 
+
+    <scm>
+        <developerConnection>scm:git:git@gitlab.redborder.lan:bigdata//samza-ioc.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>internal</id>
+            <name>readBorder Internal Repository</name>
+            <url>http://archiva.redborder.lan/repository/internal/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>redBorder Snapshot Repository</name>
+            <url>http://archiva.redborder.lan/repository/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.samza</groupId>
