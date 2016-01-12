@@ -4,7 +4,7 @@
 
     <groupId>net.redborder</groupId>
     <artifactId>samza-ioc</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <properties>
         <samza.version>0.10.0</samza.version>
@@ -13,7 +13,7 @@
 
     <scm>
         <developerConnection>scm:git:git@gitlab.redborder.lan:bigdata/samza-ioc.git</developerConnection>
-        <tag>samza-ioc-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
