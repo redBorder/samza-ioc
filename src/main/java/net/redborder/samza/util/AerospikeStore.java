@@ -58,7 +58,14 @@ public class AerospikeStore {
     }
 
     public Boolean exist(String namespace, String collection, String key) {
-        return client.exists(new Policy(), new Key(namespace, collection, key));
+        Boolean exist = false;
+        try {
+            exist = client.exists(new Policy(), new Key(namespace, collection, key));
+        } catch (AerospikeException ex) {
+            log.error("Aerospike exception", ex);
+        }
+
+        return exist;
     }
 
     public void put(String namespace, String collection, String key, Set<String> columns, Collection<Object> values) {
@@ -122,15 +129,25 @@ public class AerospikeStore {
         return client;
     }
 
-    static Set<String> iocBinKeys = new LinkedHashSet<>();
-
-    static {
+    public void updateIOC(String endpointUUID, Set<String> iocs) {
+        Set<String> iocBinKeys = new LinkedHashSet<>();
+        iocBinKeys.add("endpoint_uuid");
         iocBinKeys.add("ioc");
         iocBinKeys.add("num_ioc");
-    }
 
-    public void updateIOC(String endpointUUID, Set<String> iocs) {
-        put("malware", "ioc", endpointUUID,
-                iocBinKeys, Arrays.asList(iocs, iocs.size()));
+        if (iocs.size() == 0) {
+            remove("malware", "ioc", endpointUUID);
+        } else {
+            if (exist("malware", "ioc", endpointUUID)) {
+                put("malware", "ioc", endpointUUID,
+                        iocBinKeys, Arrays.asList(endpointUUID, iocs, iocs.size()));
+            } else {
+                iocBinKeys.add("compromised");
+
+                put("malware", "ioc", endpointUUID,
+                        iocBinKeys,
+                        Arrays.asList(endpointUUID, iocs, iocs.size(), System.currentTimeMillis() / 1000));
+            }
+        }
     }
 }
