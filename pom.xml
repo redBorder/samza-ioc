@@ -14,7 +14,7 @@
 
 
     <scm>
-        <developerConnection>scm:git:git@gitlab.redborder.lan:bigdata//samza-ioc.git</developerConnection>
+        <developerConnection>scm:git:git@gitlab.redborder.lan:bigdata/samza-ioc.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
