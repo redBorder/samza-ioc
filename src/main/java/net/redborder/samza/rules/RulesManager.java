@@ -8,6 +8,7 @@ import net.redborder.samza.rules.memory.InvalidMemoryRuleException;
 import net.redborder.samza.rules.memory.MemoryRule;
 import net.redborder.samza.rules.memory.MemoryRuleManager;
 import net.redborder.samza.rules.memory.QueryMemoryRule;
+import net.redborder.samza.rules.special.ConnectionRule;
 import org.apache.samza.config.Config;
 import org.apache.samza.storage.kv.KeyValueIterator;
 import org.apache.samza.storage.kv.KeyValueStore;
@@ -74,9 +75,9 @@ public class RulesManager {
             try {
                 Rule rule = RuleBuilder.buildRule(memoryRuleManager, mapRule);
                 rules.add(rule);
-            }catch (InvalidMemoryRuleException ex) {
+            } catch (InvalidMemoryRuleException ex) {
                 log.error("Invalid memory rule uuid.", ex);
-            }catch (Exception ex) {
+            } catch (Exception ex) {
                 log.error("Unable to make rule [ " + mapRule + " ]", ex);
             }
         }
@@ -160,6 +161,42 @@ public class RulesManager {
 
             if (type.equals("queryMemory")) {
                 rule = new QueryMemoryRule(uuid, memoryRuleManager);
+            } else if (type.equals("connection")) {
+                Map<String, Object> splits = (Map<String, Object>) ruleMap.get("splits");
+                String portsSplit = ":";
+                String connectionsSplit = ";";
+                String connectionsField = "connections";
+
+                if (splits != null) {
+                    if (splits.containsKey("ports")) {
+                        portsSplit = (String) splits.get("ports");
+                    }
+                    if (splits.containsKey("connections")) {
+                        connectionsSplit = (String) splits.get("connections");
+                    }
+                }
+
+                if(ruleMap.containsKey("connectionsField")){
+                    connectionsField = (String) ruleMap.get("connectionsField");
+                }
+
+                List<String> ips = (List<String>) ruleMap.get("ips");
+                List<String> ports = (List<String>) ruleMap.get("ports");
+                List<String> connections = (List<String>) ruleMap.get("connections");
+
+                if (ips == null) {
+                    ips = Collections.EMPTY_LIST;
+                }
+
+                if (ports == null) {
+                    ports = Collections.EMPTY_LIST;
+                }
+
+                if (connections == null) {
+                    connections = Collections.EMPTY_LIST;
+                }
+
+                rule = new ConnectionRule(uuid, connectionsSplit, portsSplit, connectionsField, ips, ports, connections);
             } else {
                 rule = buildBaseRule(memoryRuleManager, ruleMap);
             }

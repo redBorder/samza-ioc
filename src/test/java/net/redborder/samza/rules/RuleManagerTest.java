@@ -82,6 +82,19 @@ public class RuleManagerTest extends TestCase{
     }
 
     @Test
+    public void buildConnectionRule() throws IOException {
+        MockTaskContext mockTaskContext = new MockTaskContext();
+        PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
+
+        Config config = propertiesConfigFactory.getConfig(
+                URI.create("src/test/resources/rules/connectionsConfig.properties"));
+
+        RulesManager rulesManager = new RulesManager(config, mockTaskContext);
+
+        assertEquals("connection", rulesManager.rules.get(0).getType());
+    }
+
+    @Test
     public void buildQueryMemoryRule() throws IOException {
         MockTaskContext mockTaskContext = new MockTaskContext();
         PropertiesConfigFactory propertiesConfigFactory = new PropertiesConfigFactory();
