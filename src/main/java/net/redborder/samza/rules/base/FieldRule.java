@@ -14,8 +14,8 @@ public class FieldRule extends BaseRule {
     public FieldRule(String ruleUuid, Map<String, Object> enableConditions, Map<String, Object> disableConditions) throws FewConditionsException {
         super(ruleUuid);
 
-        if(enableConditions == null || disableConditions == null || (enableConditions.size() + disableConditions.size()) < 2){
-            throw new FewConditionsException("You must provide al least one enable and disable conditions.\n   " +
+        if(enableConditions == null || enableConditions.size() < 1){
+            throw new FewConditionsException("You must provide al least one enable conditions.\n   " +
                     "* enable: " + enableConditions + "\n   * disable: " + disableConditions);
         }
 

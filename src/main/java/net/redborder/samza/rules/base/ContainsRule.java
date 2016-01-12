@@ -11,8 +11,8 @@ public class ContainsRule extends BaseRule {
     public ContainsRule(String ruleUuid, Map<String, String> enableConditions, Map<String, String> disableConditions) throws FewConditionsException {
         super(ruleUuid);
 
-        if(enableConditions == null || disableConditions == null || (enableConditions.size() + disableConditions.size()) < 2){
-            throw new FewConditionsException("You must provide al least one enable and disable conditions.");
+        if(enableConditions == null || enableConditions.size() < 1){
+            throw new FewConditionsException("You must provide al least one enable conditions.");
         }
 
         this.enableConditions = enableConditions;
