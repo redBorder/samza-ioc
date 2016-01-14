@@ -33,27 +33,29 @@ public class ConnectionRule extends Rule {
 
     @Override
     public Boolean enable(String endpoint, Map<String, Object> condition) {
-        String connectionsStr = (String) condition.get(connectionsField);
         Boolean enable = false;
 
-        if(connectionsStr != null) {
-            String[] connnections = connectionsStr.split(connectionSplit);
+        if(condition.get("type") != null && condition.get("type").equals("connection")) {
+            String connectionsStr = (String) condition.get(connectionsField);
 
-            for (String connection : connnections) {
-                if (connections.contains(connection)) {
-                    enable = true;
-                    break;
-                }
+            if (connectionsStr != null) {
+                String[] connnections = connectionsStr.split(connectionSplit);
 
-                String[] hostPort = connection.split(portSplit);
+                for (String connection : connnections) {
+                    if (connections.contains(connection)) {
+                        enable = true;
+                        break;
+                    }
 
-                if (ips.contains(hostPort[0]) || ports.contains(hostPort[1])) {
-                    enable = true;
-                    break;
+                    String[] hostPort = connection.split(portSplit);
+
+                    if (ips.contains(hostPort[0]) || ports.contains(hostPort[1])) {
+                        enable = true;
+                        break;
+                    }
                 }
             }
         }
-
         return enable;
     }
 
