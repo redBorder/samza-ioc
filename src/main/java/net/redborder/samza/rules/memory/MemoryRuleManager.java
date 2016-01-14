@@ -8,12 +8,12 @@ public class MemoryRuleManager {
     public List<MemoryRule> memoryRules = new LinkedList<>();
     public List<String> memoryRulesIds = new LinkedList<>();
 
-    KeyValueStore<String, Set<String>> store;
+    KeyValueStore<String, List<String>> store;
 
-    public MemoryRuleManager(List<MemoryRule> memoryRules, KeyValueStore<String, Set<String>> store) {
+    public MemoryRuleManager(List<MemoryRule> memoryRules, KeyValueStore<String, List<String>> store) {
         this.memoryRules = memoryRules;
 
-        for(MemoryRule memoryRule : memoryRules){
+        for (MemoryRule memoryRule : memoryRules) {
             memoryRulesIds.add(memoryRule.ruleUuid);
         }
 
@@ -21,28 +21,30 @@ public class MemoryRuleManager {
     }
 
     public void verify(String endpoint, Map<String, Object> condition) {
-        Set<String> enabledRules = store.get(endpoint);
+        List<String> enabledRules = store.get(endpoint);
 
-        if(enabledRules == null){
-            enabledRules = new HashSet<>();
+        if (enabledRules == null) {
+            enabledRules = new ArrayList<>();
         }
 
         for (MemoryRule rule : memoryRules) {
             Boolean verification = rule.verify(endpoint, condition);
-            if(verification != null) {
+            if (verification != null) {
                 if (verification) {
-                    enabledRules.add(rule.ruleUuid + ":" + rule.getLastMemory());
-                    store.put(endpoint, enabledRules);
+                    if (!enabledRules.contains(rule.ruleUuid + ":" + rule.getLastMemory())) {
+                        enabledRules.add(rule.ruleUuid + ":" + rule.getLastMemory());
+                    }
                 } else {
                     enabledRules.remove(rule.ruleUuid + ":" + rule.getLastMemory());
-                    store.put(endpoint, enabledRules);
                 }
             }
         }
+
+        store.put(endpoint, enabledRules);
     }
 
     public Boolean isValidRule(String uuid) throws InvalidMemoryRuleException {
-        if(!memoryRulesIds.contains(uuid)){
+        if (!memoryRulesIds.contains(uuid)) {
             throw new InvalidMemoryRuleException("The memory rule [" + uuid + "], doesn't exist. " +
                     "Valid memory rules " + memoryRulesIds);
         }
@@ -53,8 +55,8 @@ public class MemoryRuleManager {
     public Boolean queryRule(String endpoint, String uuid) {
         Boolean enabled = false;
 
-        Set<String> rules = store.get(endpoint);
-        if(rules != null) {
+        List<String> rules = store.get(endpoint);
+        if (rules != null) {
             for (String rule : rules) {
                 if (rule.split(":")[0].equals(uuid)) {
                     enabled = true;

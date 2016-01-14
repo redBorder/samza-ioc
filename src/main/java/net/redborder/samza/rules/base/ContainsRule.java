@@ -2,6 +2,7 @@ package net.redborder.samza.rules.base;
 
 import net.redborder.samza.rules.BaseRule;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ContainsRule extends BaseRule {
@@ -11,12 +12,13 @@ public class ContainsRule extends BaseRule {
     public ContainsRule(String ruleUuid, Map<String, String> enableConditions, Map<String, String> disableConditions) throws FewConditionsException {
         super(ruleUuid);
 
-        if(enableConditions == null || enableConditions.size() < 1){
+        if (enableConditions == null || enableConditions.size() < 1) {
             throw new FewConditionsException("You must provide al least one enable conditions.");
         }
 
         this.enableConditions = enableConditions;
         this.disableConditions = disableConditions;
+
         type = "contains";
     }
 
@@ -24,13 +26,16 @@ public class ContainsRule extends BaseRule {
     public Boolean disable(String endpoint, Map<String, Object> condition) {
         Boolean enabled = true;
 
-        for (Map.Entry<String, String> entry : disableConditions.entrySet()) {
-            if (!condition.containsKey(entry.getKey()) || !condition.get(entry.getKey()).toString().contains(entry.getValue())) {
-                enabled = false;
-                break;
+        if (disableConditions == null || disableConditions.isEmpty()) {
+            enabled = false;
+        } else {
+            for (Map.Entry<String, String> entry : disableConditions.entrySet()) {
+                if (!condition.containsKey(entry.getKey()) || !condition.get(entry.getKey()).toString().contains(entry.getValue())) {
+                    enabled = false;
+                    break;
+                }
             }
         }
-
 
         return enabled;
     }

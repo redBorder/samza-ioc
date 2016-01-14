@@ -1,5 +1,6 @@
 package net.redborder.samza.util;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.aerospike.client.*;
@@ -10,6 +11,7 @@ import com.aerospike.client.policy.RecordExistsAction;
 import com.aerospike.client.policy.WritePolicy;
 
 import org.apache.samza.config.Config;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,7 @@ public class AerospikeStore {
     List<String> hosts;
     Integer timeout;
     WritePolicy writePolicy;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     public AerospikeStore(Config config) {
         hosts = config.getList("redborder.stores.extension.aerospike.servers");
@@ -129,25 +132,31 @@ public class AerospikeStore {
         return client;
     }
 
-    public void updateIOC(String endpointUUID, Set<String> iocs) {
+    public void updateIOC(String endpointUUID, List<String> iocs) {
         Set<String> iocBinKeys = new LinkedHashSet<>();
         iocBinKeys.add("endpoint_uuid");
         iocBinKeys.add("ioc");
         iocBinKeys.add("num_ioc");
 
-        if (iocs.size() == 0) {
-            remove("malware", "ioc", endpointUUID);
-        } else {
-            if (exist("malware", "ioc", endpointUUID)) {
-                put("malware", "ioc", endpointUUID,
-                        iocBinKeys, Arrays.asList(endpointUUID, iocs, iocs.size()));
-            } else {
-                iocBinKeys.add("compromised");
+        try {
+            String iocStr = objectMapper.writeValueAsString(iocs);
 
-                put("malware", "ioc", endpointUUID,
-                        iocBinKeys,
-                        Arrays.asList(endpointUUID, iocs, iocs.size(), System.currentTimeMillis() / 1000));
+            if (iocs.size() == 0) {
+                remove("malware", "ioc", endpointUUID);
+            } else {
+                if (exist("malware", "ioc", endpointUUID)) {
+                    put("malware", "ioc", endpointUUID,
+                            iocBinKeys, Arrays.<Object>asList(endpointUUID, iocStr, iocs.size()));
+                } else {
+                    iocBinKeys.add("compromised");
+
+                    put("malware", "ioc", endpointUUID,
+                            iocBinKeys,
+                            Arrays.<Object>asList(endpointUUID, iocStr, iocs.size(), System.currentTimeMillis() / 1000));
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
