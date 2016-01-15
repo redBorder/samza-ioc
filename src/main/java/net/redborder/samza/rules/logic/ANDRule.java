@@ -33,7 +33,6 @@ public class ANDRule extends BaseRule {
     @Override
     public Boolean enable(String endpoint, Map<String, Object> condition) {
         Boolean isEnabled = true;
-
         for(Rule rule : rules){
             Boolean verification = rule.verify(endpoint, condition);
             if(verification == null || !verification){

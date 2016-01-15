@@ -49,7 +49,7 @@ public class ConnectionRule extends Rule {
 
                     String[] hostPort = connection.split(portSplit);
 
-                    if (ips.contains(hostPort[0]) || ports.contains(hostPort[1])) {
+                    if (hostPort.length == 2 && (ips.contains(hostPort[0]) || ports.contains(hostPort[1]))) {
                         enable = true;
                         break;
                     }

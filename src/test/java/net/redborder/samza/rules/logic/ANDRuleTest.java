@@ -25,7 +25,7 @@ public class ANDRuleTest extends TestCase {
         Map<String, Object> enabledConditionsField = new HashMap<>();
         Map<String, Object> disabledConditionsField = new HashMap<>();
         enabledConditionsField.put("field3", "value3");
-        enabledConditionsField.put("field4", "value4");
+        disabledConditionsField.put("field4", "value4");
 
         ContainsRule containsRule = new ContainsRule("CONTAINS", enabledConditionsContains, disabledConditionsContains);
         FieldRule fieldRule = new FieldRule("FIELD", enabledConditionsField, disabledConditionsField);

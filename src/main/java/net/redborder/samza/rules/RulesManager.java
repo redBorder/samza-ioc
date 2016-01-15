@@ -139,7 +139,6 @@ public class RulesManager {
                     Rule r = buildRule(memoryRuleManager, rMap);
                     rules.add(r);
                 }
-
                 baseRule = new ANDRule(uuid, rules);
             } else if (type.equals("or")) {
                 List<Rule> rules = new LinkedList<>();
