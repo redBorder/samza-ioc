@@ -23,6 +23,7 @@ public class ConnectionRuleTest extends TestCase {
 
         Map<String, Object> message = new HashMap<>();
         message.put("connections", "192.168.1.1:84112;192.168.2.2:12341");
+        message.put("type", "connection");
         assertTrue(connectionRule.verify("AABBCCDD", message));
     }
 
@@ -33,6 +34,7 @@ public class ConnectionRuleTest extends TestCase {
 
         Map<String, Object> message = new HashMap<>();
         message.put("connections", "192.168.1.1:84112;192.168.2.2:12341");
+        message.put("type", "connection");
         assertTrue(connectionRule.verify("AABBCCDD", message));
     }
 
@@ -43,6 +45,7 @@ public class ConnectionRuleTest extends TestCase {
 
         Map<String, Object> message = new HashMap<>();
         message.put("connections", "192.168.1.1:84112;192.168.2.2:12341");
+        message.put("type", "connection");
         assertTrue(connectionRule.verify("AABBCCDD", message));
     }
 

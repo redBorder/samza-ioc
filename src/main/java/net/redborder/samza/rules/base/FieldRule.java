@@ -4,6 +4,7 @@ import net.redborder.samza.rules.BaseRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class FieldRule extends BaseRule {
@@ -14,13 +15,14 @@ public class FieldRule extends BaseRule {
     public FieldRule(String ruleUuid, Map<String, Object> enableConditions, Map<String, Object> disableConditions) throws FewConditionsException {
         super(ruleUuid);
 
-        if(enableConditions == null || enableConditions.size() < 1){
+        if (enableConditions == null || enableConditions.size() < 1) {
             throw new FewConditionsException("You must provide al least one enable conditions.\n   " +
                     "* enable: " + enableConditions + "\n   * disable: " + disableConditions);
         }
 
         this.enableConditions = enableConditions;
         this.disableConditions = disableConditions;
+
         type = "field";
     }
 
@@ -28,10 +30,14 @@ public class FieldRule extends BaseRule {
     public Boolean disable(String endpoint, Map<String, Object> condition) {
         Boolean enabled = true;
 
-        for (Map.Entry<String, Object> entry : disableConditions.entrySet()) {
-            if (!condition.containsKey(entry.getKey()) || !condition.get(entry.getKey()).equals(entry.getValue())) {
-                enabled = false;
-                break;
+        if (disableConditions == null || disableConditions.isEmpty()) {
+            enabled = false;
+        } else {
+            for (Map.Entry<String, Object> entry : disableConditions.entrySet()) {
+                if (!condition.containsKey(entry.getKey()) || !condition.get(entry.getKey()).equals(entry.getValue())) {
+                    enabled = false;
+                    break;
+                }
             }
         }
         return enabled;

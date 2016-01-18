@@ -23,7 +23,7 @@ import java.util.*;
 public class RulesManager {
     public MemoryRuleManager memoryRuleManager;
     public List<Rule> rules = new LinkedList<>();
-    public KeyValueStore<String, Set<String>> rulesStores;
+    public KeyValueStore<String, List<String>> rulesStores;
 
     private static final Logger log = LoggerFactory.getLogger(RulesManager.class);
 
@@ -38,6 +38,7 @@ public class RulesManager {
             initMemoryRules(memoryRules, taskContext);
         } catch (IOException e) {
             log.error("Error parser memory rules", e);
+            log.error("Rules: {}", jsonMemoryRules);
         }
 
         try {
@@ -45,6 +46,7 @@ public class RulesManager {
             initRules(rules, taskContext);
         } catch (IOException e) {
             log.error("Error parser  rules", e);
+            log.error("Rules: {}", jsonRules);
         }
     }
 
@@ -65,11 +67,11 @@ public class RulesManager {
         }
 
         this.memoryRuleManager =
-                new MemoryRuleManager(memoryRules, (KeyValueStore<String, Set<String>>) taskContext.getStore("memoryRules"));
+                new MemoryRuleManager(memoryRules, (KeyValueStore<String, List<String>>) taskContext.getStore("memoryRules"));
     }
 
     private void initRules(List<Map<String, Object>> mapRules, TaskContext taskContext) {
-        this.rulesStores = (KeyValueStore<String, Set<String>>) taskContext.getStore("rules");
+        this.rulesStores = (KeyValueStore<String, List<String>>) taskContext.getStore("rules");
 
         for (Map<String, Object> mapRule : mapRules) {
             try {
@@ -84,18 +86,20 @@ public class RulesManager {
     }
 
     public void verify(String endpoint, Map<String, Object> condition) {
-        Set<String> endpointRules = rulesStores.get(endpoint);
+        List<String> endpointRules = rulesStores.get(endpoint);
         memoryRuleManager.verify(endpoint, condition);
 
         if (endpointRules == null) {
-            endpointRules = new HashSet<>();
+            endpointRules = new ArrayList<>();
         }
 
         for (Rule rule : rules) {
             Boolean verification = rule.verify(endpoint, condition);
             if (verification != null) {
                 if (verification) {
-                    endpointRules.add(rule.ruleUuid);
+                    if(!endpointRules.contains(rule.ruleUuid)) {
+                        endpointRules.add(rule.ruleUuid);
+                    }
                 } else {
                     endpointRules.remove(rule.ruleUuid);
                 }
@@ -106,7 +110,7 @@ public class RulesManager {
         rulesStores.put(endpoint, endpointRules);
     }
 
-    public KeyValueIterator<String, Set<String>> getRules() {
+    public KeyValueIterator<String, List<String>> getRules() {
         return rulesStores.all();
     }
 
@@ -135,7 +139,6 @@ public class RulesManager {
                     Rule r = buildRule(memoryRuleManager, rMap);
                     rules.add(r);
                 }
-
                 baseRule = new ANDRule(uuid, rules);
             } else if (type.equals("or")) {
                 List<Rule> rules = new LinkedList<>();
@@ -148,7 +151,7 @@ public class RulesManager {
 
                 baseRule = new ORRule(uuid, rules);
             } else {
-                log.warn("The type {} isn't a valid base rule type.", type);
+                log.warn("The type [{}] isn't a valid base rule type. Rule [{}]", type, ruleMap);
             }
 
             return baseRule;
